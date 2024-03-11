@@ -1,10 +1,14 @@
-import Image from "next/image";
-import GoogleMapContainer from "@/app/components/Map/GoogleMap";
+import Image from 'next/image';
+import GoogleMapContainer from '@/app/components/Map/GoogleMap';
+import HeaderToolBar from '@/app/components/HeaderToolBar';
 
 export default function Home() {
   return (
-    <main>
-      <GoogleMapContainer/>
-    </main>
+    <div>
+      <HeaderToolBar />
+      <main>
+        <GoogleMapContainer />
+      </main>
+    </div>
   );
 }

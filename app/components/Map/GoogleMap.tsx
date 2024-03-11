@@ -26,6 +26,7 @@ const GoogleMapContainer = () => {
           defaultCenter={basePosition}
           center={basePosition}
         >
+          {/* @ts-ignore */}
           <Marker position={basePosition} onClick={() => setOpen(true)}>
             <Pin />
           </Marker>

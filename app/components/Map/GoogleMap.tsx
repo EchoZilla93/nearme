@@ -7,13 +7,14 @@ import {
   Pin,
   InfoWindow,
 } from '@vis.gl/react-google-maps';
-import { useEffect, useState } from 'react';
 import { mapLayout } from '@/app/components/Map/assets/mapStyle';
-import { useAppSelector } from '@/app/hooks/redux';
+import useMap from '@/app/components/Map/useMap';
+import { DefaultMaker } from '@/app/components/Map/Markers';
+import MarkerModal from '@/app/components/Map/Modals/MarkerModal';
 
 const GoogleMapContainer = () => {
-  const [open, setOpen] = useState(false);
-  const basePosition = useAppSelector((state) => state.geolocation.center);
+  const { basePosition, handleMapCordClick, setOpen, open, isOpenModalWindow } =
+    useMap();
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC__GOOGLEMAPS_API_KEY!}>
@@ -24,10 +25,14 @@ const GoogleMapContainer = () => {
           disableDefaultUI
           defaultZoom={13}
           defaultCenter={basePosition}
-          center={basePosition}
+          onClick={handleMapCordClick}
         >
           {/* @ts-ignore */}
-          <Marker position={basePosition} onClick={() => setOpen(true)}>
+          <Marker
+            position={basePosition}
+            anchorPoint={basePosition}
+            onClick={() => setOpen(true)}
+          >
             <Pin />
           </Marker>
           {open && (
@@ -35,13 +40,11 @@ const GoogleMapContainer = () => {
               position={basePosition}
               onCloseClick={() => setOpen(false)}
             >
-              <div style={{ color: '#f3c' }}>
-                <h1>San Francisco</h1>
-                <p>Home of GitHub</p>
-              </div>
+              <DefaultMaker />
             </InfoWindow>
           )}
         </Map>
+        {isOpenModalWindow && <MarkerModal />}
       </div>
     </APIProvider>
   );

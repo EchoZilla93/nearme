@@ -11,10 +11,20 @@ import { mapLayout } from '@/app/components/Map/assets/mapStyle';
 import useMap from '@/app/components/Map/useMap';
 import { DefaultMaker } from '@/app/components/Map/Markers';
 import MarkerModal from '@/app/components/Map/Modals/MarkerModal';
+import {useEffect} from "react";
+import axios from "axios";
+import {useAppSelector} from "@/app/hooks/redux";
+import {getNewMarkerModalData} from "@/app/store/reducers/markerModalReducer";
+import {getNewPinData} from "@/app/store/selectors/modal";
 
 const GoogleMapContainer = () => {
   const { basePosition, handleMapCordClick, setOpen, open, isOpenModalWindow } =
     useMap();
+  const addedMarker = useAppSelector(getNewPinData);
+
+  useEffect(() => {
+    axios.get('/api/getPinsData').then((res) => console.log(res.data));
+  }, [addedMarker]);
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC__GOOGLEMAPS_API_KEY!}>

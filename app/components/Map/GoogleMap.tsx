@@ -7,13 +7,29 @@ import {
   Pin,
   InfoWindow,
 } from '@vis.gl/react-google-maps';
-import { useEffect, useState } from 'react';
 import { mapLayout } from '@/app/components/Map/assets/mapStyle';
-import { useAppSelector } from '@/app/hooks/redux';
+import useMap from '@/app/components/Map/useMap';
+import { DefaultMaker } from '@/app/components/Map/Markers';
+import MarkerModal from '@/app/components/Map/Modals/MarkerModal';
+import { IMarkerModal } from '@/app/store/reducers/markerModalReducer';
+import {pinColors} from "@/app/components/Map/mock/pinColors";
 
 const GoogleMapContainer = () => {
-  const [open, setOpen] = useState(false);
-  const basePosition = useAppSelector((state) => state.geolocation.center);
+  const {
+    basePosition,
+    handleMapCordClick,
+    setOpen,
+    open,
+    isOpenModalWindow,
+    areaPinsArray,
+    setActivePinCoords,
+    activePinCoords,
+  } = useMap();
+
+  const mapPinClickHandler = (pin: IMarkerModal) => {
+    setOpen(true);
+    setActivePinCoords(pin.coords);
+  };
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC__GOOGLEMAPS_API_KEY!}>
@@ -24,24 +40,28 @@ const GoogleMapContainer = () => {
           disableDefaultUI
           defaultZoom={13}
           defaultCenter={basePosition}
-          center={basePosition}
+          onClick={handleMapCordClick}
         >
-          {/* @ts-ignore */}
-          <Marker position={basePosition} onClick={() => setOpen(true)}>
-            <Pin />
-          </Marker>
+          {areaPinsArray.length &&
+            areaPinsArray.map((pin: IMarkerModal) => (
+              <Marker
+                key={pin.coords.lat}
+                position={pin.coords}
+                anchorPoint={pin.coords}
+                onClick={() => mapPinClickHandler(pin)}
+                background={pinColors[pin.category]}
+              />
+            ))}
           {open && (
             <InfoWindow
-              position={basePosition}
+              position={activePinCoords ? activePinCoords : basePosition}
               onCloseClick={() => setOpen(false)}
             >
-              <div style={{ color: '#f3c' }}>
-                <h1>San Francisco</h1>
-                <p>Home of GitHub</p>
-              </div>
+              <DefaultMaker />
             </InfoWindow>
           )}
         </Map>
+        {isOpenModalWindow && <MarkerModal />}
       </div>
     </APIProvider>
   );

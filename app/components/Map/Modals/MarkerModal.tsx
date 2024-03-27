@@ -7,7 +7,7 @@ import {
 } from '@/app/store/reducers/markerModalReducer';
 import { getModalCategory } from '@/app/store/selectors/modal';
 import useMap from '@/app/components/Map/useMap';
-import axios from "axios";
+import axios from 'axios';
 
 const INPUT_FIELDS = [
   {
@@ -49,13 +49,11 @@ const MarkerModal = () => {
     const target = event.target as HTMLFormElement;
     const dataToStore = {} as IMarkerModal;
 
-    Array.from(target).forEach(
-        (el) => {
-          if (el.id === '') return;
-          //@ts-ignore
-         return dataToStore[el.id] = el.value
-        }
-    );
+    Array.from(target).forEach((el) => {
+      if (el.id === '') return;
+      //@ts-ignore
+      return (dataToStore[el.id] = el.value);
+    });
 
     dataToStore!.coords = basePosition;
     dataToStore!.category = placeCategory?.toLowerCase() || '';
@@ -67,7 +65,7 @@ const MarkerModal = () => {
     //TODO: Handle close marker info window after submit
     setOpen(false);
     handleCloseModal();
-  }
+  };
   return (
     <div
       id='default-modal'
@@ -90,9 +88,7 @@ const MarkerModal = () => {
             </button>
           </div>
           <div className='p-4 md:p-5 space-y-4'>
-            <form
-              onSubmit={handleMarkerFormSubmit}
-            >
+            <form onSubmit={handleMarkerFormSubmit}>
               {INPUT_FIELDS.map((field, index) => (
                 <div key={index}>
                   {field.type === 'input' ? (

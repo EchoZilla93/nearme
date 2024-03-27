@@ -11,20 +11,25 @@ import { mapLayout } from '@/app/components/Map/assets/mapStyle';
 import useMap from '@/app/components/Map/useMap';
 import { DefaultMaker } from '@/app/components/Map/Markers';
 import MarkerModal from '@/app/components/Map/Modals/MarkerModal';
-import {useEffect} from "react";
-import axios from "axios";
-import {useAppSelector} from "@/app/hooks/redux";
-import {getNewMarkerModalData} from "@/app/store/reducers/markerModalReducer";
-import {getNewPinData} from "@/app/store/selectors/modal";
+import { IMarkerModal } from '@/app/store/reducers/markerModalReducer';
+import {pinColors} from "@/app/components/Map/mock/pinColors";
 
 const GoogleMapContainer = () => {
-  const { basePosition, handleMapCordClick, setOpen, open, isOpenModalWindow } =
-    useMap();
-  const addedMarker = useAppSelector(getNewPinData);
+  const {
+    basePosition,
+    handleMapCordClick,
+    setOpen,
+    open,
+    isOpenModalWindow,
+    areaPinsArray,
+    setActivePinCoords,
+    activePinCoords,
+  } = useMap();
 
-  useEffect(() => {
-    axios.get('/api/getPinsData').then((res) => console.log(res.data));
-  }, [addedMarker]);
+  const mapPinClickHandler = (pin: IMarkerModal) => {
+    setOpen(true);
+    setActivePinCoords(pin.coords);
+  };
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC__GOOGLEMAPS_API_KEY!}>
@@ -37,17 +42,19 @@ const GoogleMapContainer = () => {
           defaultCenter={basePosition}
           onClick={handleMapCordClick}
         >
-          {/* @ts-ignore */}
-          <Marker
-            position={basePosition}
-            anchorPoint={basePosition}
-            onClick={() => setOpen(true)}
-          >
-            <Pin />
-          </Marker>
+          {areaPinsArray.length &&
+            areaPinsArray.map((pin: IMarkerModal) => (
+              <Marker
+                key={pin.coords.lat}
+                position={pin.coords}
+                anchorPoint={pin.coords}
+                onClick={() => mapPinClickHandler(pin)}
+                background={pinColors[pin.category]}
+              />
+            ))}
           {open && (
             <InfoWindow
-              position={basePosition}
+              position={activePinCoords ? activePinCoords : basePosition}
               onCloseClick={() => setOpen(false)}
             >
               <DefaultMaker />
